@@ -90,8 +90,9 @@ button:focus-visible,.card:focus-visible{outline:4px solid #fff;outline-offset:3
 .prize.on{filter:none;animation:spin 1.6s infinite}
 .sc{width:84px;text-align:center;font-size:34px;font-weight:800;color:var(--gold);flex:none}
 @keyframes spin{50%{transform:scale(1.2) rotate(10deg)}}
+.btn.resume{font-size:22px;padding:10px 30px;box-shadow:0 4px 0 #B98419,0 8px 16px #0007}
 .bnav{bottom:22px;right:60px;display:flex;gap:14px}
-.bmsg{bottom:26px;left:60px;width:640px;text-align:center;font-size:30px;font-weight:800;line-height:1.4}
+.bmsg{bottom:26px;left:60px;width:540px;text-align:center;font-size:30px;font-weight:800;line-height:1.4}
 canvas#cf{position:absolute;inset:0;pointer-events:none;z-index:9}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style></head><body>
@@ -112,7 +113,7 @@ canvas#cf{position:absolute;inset:0;pointer-events:none;z-index:9}
    <div class="card" tabindex="0" role="button" data-m="all"><div class="n">🏆</div><b>المسابقة الشاملة</b><small>أسئلة من الدرسين معًا</small><span class="cnt" id="ca"></span></div>
   </div>
   <div class="chips" id="chips"></div>
-  <div class="home-btns"><button class="btn ghost" id="toBoard">لوحة الفرق</button><button class="btn ghost" id="toSetup">تغيير عدد الفرق</button></div>
+  <div class="home-btns"><button class="btn resume" id="hBack" style="display:none">متابعة المسابقة</button><button class="btn ghost" id="toBoard">لوحة الفرق</button><button class="btn ghost" id="toSetup">تغيير عدد الفرق</button></div>
  </section>
  <section class="scr" id="intro">
   <div class="tag" id="itag"></div>
@@ -133,7 +134,7 @@ canvas#cf{position:absolute;inset:0;pointer-events:none;z-index:9}
   <div class="goal" id="goal"></div>
   <div class="rows" id="rows"></div>
   <div class="bmsg" id="bmsg"></div>
-  <div class="bnav"><button class="btn ghost" id="bHome">الرئيسية</button><button class="btn ghost" id="bReset">تصفير النقاط</button></div>
+  <div class="bnav"><button class="btn resume" id="bBack" style="display:none">متابعة المسابقة</button><button class="btn ghost" id="bHome">الرئيسية</button><button class="btn ghost" id="bReset">تصفير النقاط</button></div>
  </section>
  <canvas id="cf"></canvas>
 </div>
@@ -189,7 +190,8 @@ var MODES={
 };
 $("c1").textContent=ar(L1.length)+" سؤالًا";$("c5").textContent=ar(L5.length)+" سؤالًا";$("ca").textContent=ar(L1.length+L5.length)+" سؤالًا";
 /* ===== تنقل ===== */
-function go(id){document.querySelectorAll(".scr").forEach(function(e){e.classList.toggle("on",e.id==id)});if(id=="board")drawBoard();if(id=="home")drawHome();if(id=="setup")drawSetup()}
+function inGame(){return !!mode&&!done&&list.length>0}
+function go(id){document.querySelectorAll(".scr").forEach(function(e){e.classList.toggle("on",e.id==id)});var ig=inGame();$("bBack").style.display=ig?"":"none";$("hBack").style.display=ig?"":"none";if(id=="board")drawBoard();if(id=="home")drawHome();if(id=="setup")drawSetup()}
 /* الإعداد */
 function drawSetup(){var b=$("nbtns");b.innerHTML="";[2,3,4].forEach(function(n){var x=document.createElement("button");x.className="nb"+(n==T?" sel":"");x.textContent=ar(n);x.onclick=function(){T=n;if(score.length<4)score=[0,0,0,0];save();drawSetup()};b.appendChild(x)})}
 $("goHome").onclick=function(){go("home")};$("toSetup").onclick=function(){go("setup")};
@@ -201,6 +203,7 @@ $("bReset").onclick=function(){score=[0,0,0,0];turn=0;save();drawBoard()};
 function startMode(m){if(Math.max.apply(null,score.slice(0,T))>=GOAL){score=[0,0,0,0];save()}mode=m;var M=MODES[m];list=m=="all"?shuf(M.qs):M.qs.slice();idx=0;done=false;turn=0;
  $("itag").textContent=M.n;$("ibub").textContent=M.it;$("intro").style.backgroundImage=M.ib;go("intro")}
 $("toQ").onclick=function(){showQ();go("q")};
+$("bBack").onclick=$("hBack").onclick=function(){go("q")};
 $("turn").onclick=function(){turn=(turn+1)%T;turnBtn()};
 function turnBtn(){var b=$("turn");b.style.background=COLS[turn];b.textContent="دور الفريق "+ar(turn+1)}
 function showQ(){var M=MODES[mode],x=list[idx];$("fb").className="";$("fb").innerHTML="";
